@@ -1,0 +1,59 @@
+---
+- name: Setup server
+  hosts: localhost
+  vars:
+    username: m
+    ssh_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHryj2rmpUaQGCI1ZdqKr5ta27ipvrg+5gnQgOF+6EjA"
+  tasks:
+    - name: Add user 'm' and append to 'sudo' group
+      ansible.builtin.user:
+        name: "{{ username }}"
+        shell: /bin/bash
+        groups: sudo
+        append: true
+
+    - name: Group 'sudo' to have nopasswd
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%sudo ALL='
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: /usr/sbin/visudo -cf %s
+
+    - name: Install docker requirements
+      ansible.builtin.apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+
+    - name: Install docker key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+
+    - name: Install docker repository
+      ansible.builtin.apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu jammy stable
+
+    - name: Install docker
+      ansible.builtin.apt:
+        name: docker-ce
+
+    - name: Set authorized key taken from file
+      ansible.posix.authorized_key:
+        user: "{{ username }}"
+        state: present
+        key: "{{ ssh_key }}"
+
+    - name: Disable root ssh login
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        regexp: '^PermitRootLogin\s+yes'
+        line: '# PermitRootLogin yes'
+
+    - name: Disable root password
+      ansible.builtin.user:
+        name: root
+        password: '!'
