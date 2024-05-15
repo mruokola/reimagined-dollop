@@ -4,6 +4,7 @@
   vars:
     username: m
     ssh_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHryj2rmpUaQGCI1ZdqKr5ta27ipvrg+5gnQgOF+6EjA"
+  tags: setup
   tasks:
     - name: Add user 'm' and append to 'sudo' group
       ansible.builtin.user:
@@ -57,3 +58,70 @@
       ansible.builtin.user:
         name: root
         password: '!'
+
+- name: Install Valheim
+  hosts: localhost
+  tags: valheim
+  vars:
+    username: valheim
+    server_password: changeme
+  tasks:
+    - name: Add user 'valheim' and append to 'docker' group
+      ansible.builtin.user:
+        name: "{{ username }}"
+        password: '!'
+        shell: /bin/false
+        groups: docker
+        append: true
+
+    - name: Create directories
+      ansible.builtin.file:
+        state: directory
+        path: "~{{ username }}/valheim-server/{{ item }}"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "0775"
+      with_items: [config, data]
+
+    - name: Create env file
+      ansible.builtin.copy:
+        dest: "~{{ username }}/valheim-server/valheim.env"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "0775"
+        content: |
+          SERVER_NAME=My Server
+          WORLD_NAME=Dedicated
+          SERVER_PASS={{ server_password }}
+          SERVER_PUBLIC=true
+
+    # - name: Download docker-compose.yml
+    #   ansible.builtin.get_url:
+    #     url: https://raw.githubusercontent.com/lloesche/valheim-server-docker/main/docker-compose.yaml
+    #     dest: "~{{ username }}/valheim-server/docker-compose.yaml"
+    #     owner: "{{ username }}"
+    #     group: "{{ username }}"
+    #     mode: "0775"
+
+    - name: Create docker-compose.yml
+      ansible.builtin.copy:
+        src: valheim.docker-compose.yml
+        dest: "~{{ username }}/valheim-server/docker-compose.yaml"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "0775"
+
+- name: Start Valheim
+  hosts: localhost
+  tags: valheim
+  vars:
+    username: valheim
+  collections:
+    - community.docker
+  become: yes
+  become_user: "{{ username }}"
+  tasks:
+    - name: Start container
+      community.docker.docker_compose_v2:
+        project_src: "~{{ username }}/valheim-server/"
+        state: present
