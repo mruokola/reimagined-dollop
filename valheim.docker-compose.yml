@@ -1,5 +1,6 @@
 version: "3"
 
+# from https://raw.githubusercontent.com/lloesche/valheim-server-docker/main/docker-compose.yaml
 services:
   valheim:
     image: ghcr.io/lloesche/valheim-server
@@ -10,7 +11,11 @@ services:
       - $HOME/valheim-server/data:/opt/valheim
     ports:
       - "2456-2458:2456-2458/udp"
-    env_file:
-      - $HOME/valheim-server/valheim.env
+    environment:
+      - SERVER_NAME={{ valheim_server_name }}
+      - WORLD_NAME={{ valheim_server_world_name }}
+      - SERVER_PASS={{ valheim_server_password }}
+      - SERVER_PUBLIC={{ valheim_server_public }}
+      - VALHEIM_PLUS={{ valheim_server_valheim_plus }}
     restart: always
     stop_grace_period: 2m

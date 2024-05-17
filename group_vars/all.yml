@@ -1,0 +1,9 @@
+login_account_username: m
+login_account_ssh_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHryj2rmpUaQGCI1ZdqKr5ta27ipvrg+5gnQgOF+6EjA"
+
+valheim_account_username: valheim
+valheim_server_name: My Server
+valheim_server_world_name: Dedicated
+valheim_server_public: "false"
+valheim_server_valheim_plus: "true"
+valheim_server_password: changeme
