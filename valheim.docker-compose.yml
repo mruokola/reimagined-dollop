@@ -17,5 +17,6 @@ services:
       - SERVER_PASS={{ valheim_server_password }}
       - SERVER_PUBLIC={{ valheim_server_public }}
       - VALHEIM_PLUS={{ valheim_server_valheim_plus }}
+      - SERVER_ARGS={{ valheim_server_args }}
     restart: always
     stop_grace_period: 2m
