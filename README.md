@@ -4,7 +4,7 @@ It's a Github-generated repository name, but the purpose of this repo is to depl
 
 #### Development
 
-All the relevant Ansible code is in `local.yml`. Varialbes are in `group_vars/all.yml` and the Docker compose specs are in `valheim.docker-compose.yml`
+All the relevant Ansible code is in `local.yml`. Variables are in `group_vars/all.yml` and the Docker compose specs are in `valheim.docker-compose.yml`
 
 #### Deployment
 
@@ -16,7 +16,7 @@ Since we are using `ansible-pull`, the setup will be deployed to localhost
 ansible-pull -U https://github.com/mruokola/reimagined-dollop.git
 ```
 
-##### Setup
+##### Setup/OS preparations
 
 ```sh
 ansible-pull -U https://github.com/mruokola/reimagined-dollop.git -t setup
